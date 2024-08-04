@@ -1,0 +1,154 @@
+var slider_blogs = jQuery('.slider_blogs');
+if (slider_blogs.length > 0) {
+  new Splide('.slider_blogs', {
+    lazyLoad: true,
+    perPage: 4,
+    perMove: 1,
+    pagination: false,
+    drag: true,
+    direction: 'rtl',
+    breakpoints: {
+      500: {perPage: 1},
+      768: {perPage: 2},
+      991: {perPage: 3},
+      1023: {perPage: 4},
+      1699: {perPage: 4}
+    },
+    autoplay: false,
+  }).mount();
+}
+
+jQuery(document).ready(function ($) {
+  $(".icon-pushmenu").click(function (e) {
+    $("body").addClass("menu-bars-active");
+  });
+  $(".overlay").click(function (e) {
+    $("body").removeClass("menu-bars-active");
+  });
+  $("#close-notif").click(function (e) {
+    $(".notif").addClass("hidden");
+  });
+  $(".list-menu li.menu-item-has-children").append('<span class="fa fa-angle-down"></span>');
+  $(".list-menu li.menu-item-has-children span").click(function (e) {
+    $(this).parent().toggleClass('active');
+  });
+
+});
+// window.holidays = ["1398/01/01", "1398/01/02", "1398/01/03", "1398/01/04", "1398/01/12", "1398/01/13", "1398/01/14"];
+//
+var inputs = document.querySelectorAll("input[mh1pdp]");
+for (i = 0; i < inputs.length; i++) {
+  (function (i) {
+    inputs[i].addEventListener('click', function () {
+      Mh1PersianDatePicker.Show(this, '1401/05/21');
+    });
+  })(i);
+}
+var inputs = document.querySelectorAll("input[anyattr]");
+for (i = 0; i < inputs.length; i++) {
+  (function (i) {
+    inputs[i].addEventListener('click', function () {
+      Mh1PersianDatePicker.Show(this, '1401/05/21');
+    });
+  })(i);
+}
+
+function startTimer(e, t) {
+  var r, n, a = e,
+      s = setInterval(function () {
+        r = parseInt(a / 60, 10),
+            n = parseInt(a % 60, 10),
+            r = r < 10 ? "0" + r : r, n = n < 10 ? "0" + n : n,
+            t.textContent = r + ":" + n,
+        --a < 0 && (
+            a = 0,
+                jQuery("#register-btn").html("ارسال دوباره کد"),
+                jQuery("#register-btn").removeClass("hidden"),
+                jQuery("#register-btn").removeClass("btn disabled"),
+                jQuery("#register-btn").prop("disabled", !1),
+                clearInterval(s)
+        )
+      }, 1e3)
+}
+jQuery(document).ready(function ($) {
+$(".btn-register-login").on("click", function (t) {
+  t.preventDefault();
+  var r = $(this),
+      n = $("#user_phone").val();
+  // debugger;
+      if (0 !== n.length ) {
+    var o = $("#woocommerce-register-nonce").val();
+    r[0].innerHTML = "صبر کنید ...",
+        r.addClass("disabled"),
+        r.prop("disabled", !0),
+        $.ajax({
+          url: ajax_login_object.ajaxurl,
+          type: "POST",
+          dataType: "json",
+          data: {
+            action: "sl_user_register",
+            user_phone: n,
+            security: o,
+          },
+          success: function (e) {
+            if (e.error) {
+              // debugger;
+              alert(e.message, "خطا");
+              r.removeClass("disabled");
+              r.prop("disabled", !1);
+              r[0].innerHTML = "تایید شماره تلفن";
+            } else {
+              // debugger;
+              var d = e.code;
+              r.addClass("hidden");
+              jQuery("#msg_box").removeClass("hidden");
+              jQuery("#register-btn").html("صبر کنید ...");
+              jQuery("#register-btn").addClass("hidden");
+              var i = document.querySelector("#time");
+              i.textContent = "02:00";
+              startTimer(120, i);
+              jQuery(".send-code-btn").on("click", function (t) {
+                t.preventDefault(), $btncode = jQuery(this), $btncode[0].innerHTML = "صبر کنید ...";
+                var i = jQuery("#msg2").val();
+                $.ajax({
+                  url: ajax_login_object.ajaxurl,
+                  type: "POST",
+                  dataType: "json",
+                  data: {
+                    action: "sl_user_confirm_mobile",
+                    user_phone: n,
+                    security: o,
+                    msg: i,
+                    code: d
+                  },
+                  success: function (s) {
+                    if (s.success) {
+                      r.removeClass("disabled");
+                      r.removeClass("hidden");
+                      r.prop("disabled", !1);
+                      // r[0].innerHTML = "عضویت";
+                      jQuery("#msg_box").addClass("hidden");
+                      setTimeout(function () {
+                        location.reload();
+                      }, 1000);
+                    } else {
+                      $btncode[0].innerHTML = "ارسال کد";
+                      alert(s.message, "خطا")
+                    }
+                  },
+                  error: function (s) {
+                    alert(s.message, "خطا")
+                  }
+                });
+              });
+            }
+          },
+          error: function (e) {
+            alert(e.message, "خطا")
+          }
+        })
+  } else {
+    alert("لطفا فیلد های اجباری را پر کنید ", "خطا");
+  }
+});
+});
